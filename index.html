@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>野颂慧眼 - 效果分析概览</title>
+    <title>野颂慧眼 - 效果分析系统</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -54,11 +54,12 @@
       </header>
 
       <nav class="tabs" aria-label="效果分析页面">
-        <button class="tab active" type="button">概览</button>
+        <button class="tab active" data-tab="overview" type="button">概览</button>
+        <button class="tab" data-tab="keywords" type="button">关键词分析</button>
       </nav>
 
       <section class="stage">
-        <section class="overview">
+        <section id="overviewSection" class="overview">
           <article class="focus-card">
             <div id="focusPlatform" class="focus-platform">全部平台</div>
 
@@ -94,8 +95,69 @@
             </div>
           </article>
         </section>
+
+        <section id="keywordSection" class="keyword-analysis hidden">
+          <div class="keyword-control">
+            <div>
+              <div class="control-label">指标选择</div>
+              <div id="keywordMetricTabs" class="metric-tabs inline-tabs" aria-label="关键词分析指标切换"></div>
+            </div>
+            <p>关键词分析围绕「哪个词、哪类词、哪个平台」定位优化对象。</p>
+          </div>
+
+          <div class="keyword-grid">
+            <article class="keyword-card">
+              <div class="keyword-card-header">
+                <div>
+                  <h2>关键词表现排行 TOP5 <span class="info-dot">i</span></h2>
+                  <p>触达率维度下的重点关键词。</p>
+                </div>
+                <button id="openKeywordModal" class="more-button" type="button">更多 ↗</button>
+              </div>
+              <div id="keywordRankList" class="keyword-rank-list"></div>
+            </article>
+
+            <article class="keyword-card">
+              <div class="keyword-card-header">
+                <div>
+                  <h2>关键词类型表现 <span class="info-dot">i</span></h2>
+                  <p>判断问题集中在哪类搜索意图。</p>
+                </div>
+              </div>
+              <div id="keywordTypeList" class="keyword-type-list"></div>
+            </article>
+          </div>
+
+          <article class="keyword-card keyword-diff-card">
+            <div class="keyword-card-header">
+              <div>
+                <h2>平台差异 TOP10 <span class="info-dot">i</span></h2>
+                <p>单个词在不同平台的差异越大，越需要平台专项优化。</p>
+              </div>
+            </div>
+            <div class="keyword-table-wrap">
+              <table class="keyword-table">
+                <thead id="keywordDiffHead"></thead>
+                <tbody id="keywordDiffBody"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
       </section>
     </main>
+
+    <div id="keywordModal" class="modal-backdrop hidden">
+      <section class="keyword-modal" role="dialog" aria-modal="true" aria-label="关键词表现排行 Top10">
+        <div class="modal-header">
+          <div>
+            <h2>关键词表现排行 TOP10</h2>
+            <p>触达率维度下的完整排行。</p>
+          </div>
+          <button id="closeKeywordModal" class="modal-close" type="button" aria-label="关闭">×</button>
+        </div>
+        <div id="keywordModalList" class="keyword-rank-list"></div>
+      </section>
+    </div>
 
     <script src="./app.js"></script>
   </body>
