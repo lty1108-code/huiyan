@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>野颂慧眼 - 效果分析概览</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div>
+        <div class="brand">野颂慧眼</div>
+        <nav class="nav">
+          <button class="nav-item active" type="button"><span>▦</span>效果分析系统</button>
+          <button class="nav-item" type="button"><span>⌕</span>需求挖掘系统</button>
+          <button class="nav-item" type="button"><span>✎</span>内容生产系统</button>
+        </nav>
+      </div>
+      <div class="nav footer">
+        <button class="nav-item" type="button"><span>▤</span>专属知识库</button>
+        <button class="nav-item" type="button"><span>⚙</span>系统设置</button>
+        <button class="nav-item" type="button"><span>?</span>帮助支持</button>
+        <button class="nav-item" type="button"><span>↪</span>退出系统</button>
+      </div>
+    </aside>
+
+    <main class="app">
+      <header class="topbar">
+        <div class="selectors">
+          <select aria-label="当前项目">
+            <option>红星美羚羊奶粉内容优化项目</option>
+          </select>
+          <span class="divider"></span>
+          <select aria-label="时间范围">
+            <option>最近 30 天</option>
+            <option>最近 14 天</option>
+            <option>最近 7 天</option>
+            <option>最近 3 天</option>
+            <option>最近 1 天</option>
+          </select>
+          <span class="divider"></span>
+          <select aria-label="采集批次">
+            <option>2026-05-30 第 3 批</option>
+            <option>最近一次采集</option>
+            <option>2026-05-29 第 2 批</option>
+          </select>
+          <span class="divider"></span>
+          <select id="platformSelect" aria-label="监测平台"></select>
+        </div>
+        <button class="primary" type="button">＋ 新建采集</button>
+      </header>
+
+      <nav class="tabs" aria-label="效果分析页面">
+        <button class="tab active" type="button">概览</button>
+      </nav>
+
+      <section class="stage">
+        <section class="overview">
+          <article class="focus-card">
+            <div id="focusPlatform" class="focus-platform">全部平台</div>
+
+            <div class="focus-value">
+              <span id="mainMetricValue" class="focus-number">76.8%</span>
+              <span class="focus-divider"></span>
+              <span id="mainDelta" class="delta-badge delta-up with-label">
+                <svg viewBox="0 0 28 18" aria-hidden="true"><polyline points="2,15 9,8 15,12 26,2" /></svg>
+                <span>较上期 +8%</span>
+              </span>
+            </div>
+            <div id="mainMetricLabel" class="focus-copy">触达率</div>
+
+            <div id="supportMetrics" class="focus-list"></div>
+          </article>
+
+          <article class="panel">
+            <div id="metricTabs" class="metric-tabs" aria-label="指标切换"></div>
+
+            <div class="chart-combo">
+              <div class="bars-panel">
+                <div class="section-title">模型平台横向份额</div>
+                <div id="platformBars" class="platform-bars" aria-label="平台指标对比"></div>
+              </div>
+
+              <div class="trend-panel">
+                <div class="section-title">历史多批次综合趋势变化</div>
+                <div class="trend-canvas">
+                  <svg id="trendSvg" class="trend-svg" viewBox="0 0 360 190" preserveAspectRatio="none" aria-label="历史趋势"></svg>
+                </div>
+                <div id="trendLegend" class="trend-legend"></div>
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
