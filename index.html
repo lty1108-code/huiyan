@@ -3,10 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>野颂慧眼 - 效果分析系统</title>
+    <title>野颂慧眼 - 需求挖掘系统</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -14,9 +15,9 @@
       <div>
         <div class="brand">野颂慧眼</div>
         <nav class="nav">
-          <button class="nav-item active" type="button"><span>▦</span>效果分析系统</button>
-          <button class="nav-item" type="button"><span>⌕</span>需求挖掘系统</button>
-          <button class="nav-item" type="button"><span>✎</span>内容生产系统</button>
+          <button class="nav-item" data-system="analytics" type="button"><span>▦</span>效果分析系统</button>
+          <button class="nav-item active" data-system="mining" type="button"><span>⌕</span>需求挖掘系统</button>
+          <button class="nav-item" data-system="content" type="button"><span>✎</span>内容生产系统</button>
         </nav>
       </div>
       <div class="nav footer">
@@ -28,119 +29,253 @@
     </aside>
 
     <main class="app">
-      <header class="topbar">
-        <div class="selectors">
-          <select aria-label="当前项目">
-            <option>红星美羚羊奶粉内容优化项目</option>
-          </select>
-          <span class="divider"></span>
-          <select aria-label="时间范围">
-            <option>最近 30 天</option>
-            <option>最近 14 天</option>
-            <option>最近 7 天</option>
-            <option>最近 3 天</option>
-            <option>最近 1 天</option>
-          </select>
-          <span class="divider"></span>
-          <select aria-label="采集批次">
-            <option>2026-05-30 第 3 批</option>
-            <option>最近一次采集</option>
-            <option>2026-05-29 第 2 批</option>
-          </select>
-          <span class="divider"></span>
-          <select id="platformSelect" aria-label="监测平台"></select>
-        </div>
-        <button class="primary" type="button">＋ 新建采集</button>
-      </header>
-
-      <nav class="tabs" aria-label="效果分析页面">
-        <button class="tab active" data-tab="overview" type="button">概览</button>
-        <button class="tab" data-tab="keywords" type="button">关键词分析</button>
-      </nav>
-
-      <section class="stage">
-        <section id="overviewSection" class="overview">
-          <article class="focus-card">
-            <div id="focusPlatform" class="focus-platform">全部平台</div>
-
-            <div class="focus-value">
-              <span id="mainMetricValue" class="focus-number">76.8%</span>
-              <span class="focus-divider"></span>
-              <span id="mainDelta" class="delta-badge delta-up with-label">
-                <svg viewBox="0 0 28 18" aria-hidden="true"><polyline points="2,15 9,8 15,12 26,2" /></svg>
-                <span>较上期 +8%</span>
-              </span>
-            </div>
-            <div id="mainMetricLabel" class="focus-copy">触达率</div>
-
-            <div id="supportMetrics" class="focus-list"></div>
-          </article>
-
-          <article class="panel">
-            <div id="metricTabs" class="metric-tabs" aria-label="指标切换"></div>
-
-            <div class="chart-combo">
-              <div class="bars-panel">
-                <div class="section-title">模型平台横向份额</div>
-                <div id="platformBars" class="platform-bars" aria-label="平台指标对比"></div>
-              </div>
-
-              <div class="trend-panel">
-                <div class="section-title">历史多批次综合趋势变化</div>
-                <div class="trend-canvas">
-                  <svg id="trendSvg" class="trend-svg" viewBox="0 0 360 190" preserveAspectRatio="none" aria-label="历史趋势"></svg>
-                </div>
-                <div id="trendLegend" class="trend-legend"></div>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <section id="keywordSection" class="keyword-analysis hidden">
-          <div class="keyword-control">
-            <div>
-              <div class="control-label">指标选择</div>
-              <div id="keywordMetricTabs" class="metric-tabs inline-tabs" aria-label="关键词分析指标切换"></div>
-            </div>
-            <p>关键词分析围绕「哪个词、哪类词、哪个平台」定位优化对象。</p>
+      <section id="miningSystem" class="system-screen">
+        <header class="topbar">
+          <div class="selectors">
+            <select aria-label="当前项目">
+              <option>红星美羚羊奶粉内容优化项目</option>
+            </select>
+            <span class="divider"></span>
+            <select aria-label="关键词组">
+              <option>默认关键词组</option>
+              <option>羊奶粉品类词组</option>
+              <option>竞对拦截词组</option>
+            </select>
+            <span class="divider"></span>
+            <select id="phaseSelect" aria-label="挖掘阶段"></select>
+            <span class="divider"></span>
+            <select aria-label="最近任务">
+              <option>最近一次挖掘：2026-05-30</option>
+              <option>2026-05-29 挖掘任务</option>
+            </select>
           </div>
+          <button id="runMining" class="primary" type="button">＋ 开始挖掘</button>
+        </header>
 
-          <div class="keyword-grid">
-            <article class="keyword-card">
-              <div class="keyword-card-header">
+        <section class="stage mining-stage">
+          <section class="mining-hero">
+            <article class="mining-brief">
+              <div class="section-title">DEMAND MINING</div>
+              <h1>需求挖掘系统</h1>
+              <p>围绕行业词、竞对词、本品词沉淀项目关键词资产，为内容生产与效果分析提供统一入口。</p>
+              <div class="mining-search">
+                <label for="coreKeyword">核心关键词</label>
                 <div>
-                  <h2>关键词表现排行 TOP5 <span class="info-dot">i</span></h2>
-                  <p>触达率维度下的重点关键词。</p>
+                  <input id="coreKeyword" type="text" value="羊奶粉" aria-label="核心关键词" />
+                  <button id="startMiningInline" type="button">开始挖掘</button>
                 </div>
-                <button id="openKeywordModal" class="more-button" type="button">更多 ↗</button>
               </div>
-              <div id="keywordRankList" class="keyword-rank-list"></div>
             </article>
 
-            <article class="keyword-card">
-              <div class="keyword-card-header">
-                <div>
-                  <h2>关键词类型表现 <span class="info-dot">i</span></h2>
-                  <p>判断问题集中在哪类搜索意图。</p>
-                </div>
-              </div>
-              <div id="keywordTypeList" class="keyword-type-list"></div>
-            </article>
-          </div>
-
-          <article class="keyword-card keyword-diff-card">
-            <div class="keyword-card-header">
+            <article class="mining-summary">
               <div>
-                <h2>平台差异 TOP10 <span class="info-dot">i</span></h2>
-                <p>单个词在不同平台的差异越大，越需要平台专项优化。</p>
+                <span>项目关键词资产</span>
+                <strong id="miningKeywordTotal">128</strong>
               </div>
+              <div>
+                <span>已覆盖阶段</span>
+                <strong>3/3</strong>
+              </div>
+              <div>
+                <span>本轮新增</span>
+                <strong id="miningNewCount">24</strong>
+              </div>
+            </article>
+          </section>
+
+          <section class="phase-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>选择挖掘阶段</h2>
+                <p>每个阶段会生成不同类型的关键词，后续可保存到项目资产。</p>
+              </div>
+              <button id="savePhase" class="ghost-button" type="button">保存当前阶段</button>
             </div>
-            <div class="keyword-table-wrap">
-              <table class="keyword-table">
-                <thead id="keywordDiffHead"></thead>
-                <tbody id="keywordDiffBody"></tbody>
-              </table>
+            <div id="phaseCards" class="phase-cards"></div>
+          </section>
+
+          <section class="mining-workbench">
+            <article class="mining-card mining-chart-card">
+              <div class="panel-heading compact">
+                <div>
+                  <h2>关键词分布</h2>
+                  <p id="miningChartDesc">当前阶段的高潜关键词热度分布。</p>
+                </div>
+                <div class="view-switch" aria-label="图表类型">
+                  <button class="active" data-view="bar" type="button">柱状</button>
+                  <button data-view="cloud" type="button">词云</button>
+                </div>
+              </div>
+              <div id="miningChart" class="mining-chart"></div>
+            </article>
+
+            <article class="mining-card mining-list-card">
+              <div class="panel-heading compact">
+                <div>
+                  <h2>关键词列表</h2>
+                  <p>勾选后可保存到当前项目关键词组。</p>
+                </div>
+                <input id="keywordSearch" class="small-input" type="search" placeholder="搜索关键词" />
+              </div>
+              <div id="keywordList" class="mining-keyword-list"></div>
+            </article>
+          </section>
+
+          <section class="asset-grid">
+            <article class="asset-card">
+              <h2>项目挖掘进度</h2>
+              <div id="progressCards" class="progress-cards"></div>
+            </article>
+            <article class="asset-card">
+              <h2>关键词资产维护</h2>
+              <div class="asset-rows">
+                <div><span>本品词</span><strong>42</strong><em>用于品牌防守与官方内容沉淀</em></div>
+                <div><span>竞对词</span><strong>36</strong><em>用于对比、替代方案和竞品拦截</em></div>
+                <div><span>行业词</span><strong>50</strong><em>用于科普、选型指南和场景占位</em></div>
+              </div>
+            </article>
+          </section>
+
+          <div id="selectedBar" class="selected-bar">
+            <span>已选择 <strong id="selectedCount">0</strong> 个关键词</span>
+            <button id="clearSelected" type="button">清空选择</button>
+            <button id="saveSelected" type="button">保存到关键词组</button>
+          </div>
+        </section>
+      </section>
+
+      <section id="analyticsSystem" class="system-screen hidden">
+        <header class="topbar">
+          <div class="selectors">
+            <select aria-label="当前项目">
+              <option>红星美羚羊奶粉内容优化项目</option>
+            </select>
+            <span class="divider"></span>
+            <select aria-label="时间范围">
+              <option>最近 30 天</option>
+              <option>最近 14 天</option>
+              <option>最近 7 天</option>
+              <option>最近 3 天</option>
+              <option>最近 1 天</option>
+            </select>
+            <span class="divider"></span>
+            <select aria-label="采集批次">
+              <option>2026-05-30 第 3 批</option>
+              <option>最近一次采集</option>
+              <option>2026-05-29 第 2 批</option>
+            </select>
+            <span class="divider"></span>
+            <select id="platformSelect" aria-label="监测平台"></select>
+          </div>
+          <button class="primary" type="button">＋ 新建采集</button>
+        </header>
+
+        <nav class="tabs" aria-label="效果分析页面">
+          <button class="tab active" data-tab="overview" type="button">概览</button>
+          <button class="tab" data-tab="keywords" type="button">关键词分析</button>
+        </nav>
+
+        <section class="stage">
+          <section id="overviewSection" class="overview">
+            <article class="focus-card">
+              <div id="focusPlatform" class="focus-platform">全部平台</div>
+
+              <div class="focus-value">
+                <span id="mainMetricValue" class="focus-number">76.8%</span>
+                <span class="focus-divider"></span>
+                <span id="mainDelta" class="delta-badge delta-up with-label">
+                  <svg viewBox="0 0 28 18" aria-hidden="true"><polyline points="2,15 9,8 15,12 26,2" /></svg>
+                  <span>较上期 +8%</span>
+                </span>
+              </div>
+              <div id="mainMetricLabel" class="focus-copy">触达率</div>
+
+              <div id="supportMetrics" class="focus-list"></div>
+            </article>
+
+            <article class="panel">
+              <div id="metricTabs" class="metric-tabs" aria-label="指标切换"></div>
+
+              <div class="chart-combo">
+                <div class="bars-panel">
+                  <div class="section-title">模型平台横向份额</div>
+                  <div id="platformBars" class="platform-bars" aria-label="平台指标对比"></div>
+                </div>
+
+                <div class="trend-panel">
+                  <div class="section-title">历史多批次综合趋势变化</div>
+                  <div class="trend-canvas">
+                    <svg id="trendSvg" class="trend-svg" viewBox="0 0 360 190" preserveAspectRatio="none" aria-label="历史趋势"></svg>
+                  </div>
+                  <div id="trendLegend" class="trend-legend"></div>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <section id="keywordSection" class="keyword-analysis hidden">
+            <div class="keyword-control">
+              <div>
+                <div class="control-label">指标选择</div>
+                <div id="keywordMetricTabs" class="metric-tabs inline-tabs" aria-label="关键词分析指标切换"></div>
+              </div>
+              <p>关键词分析围绕「哪个词、哪类词、哪个平台」定位优化对象。</p>
             </div>
+
+            <div class="keyword-grid">
+              <article class="keyword-card">
+                <div class="keyword-card-header">
+                  <div>
+                    <h2>关键词表现排行 TOP5 <span class="info-dot">i</span></h2>
+                    <p>触达率维度下的重点关键词。</p>
+                  </div>
+                  <button id="openKeywordModal" class="more-button" type="button">更多 ↗</button>
+                </div>
+                <div id="keywordRankList" class="keyword-rank-list"></div>
+              </article>
+
+              <article class="keyword-card">
+                <div class="keyword-card-header">
+                  <div>
+                    <h2>关键词类型表现 <span class="info-dot">i</span></h2>
+                    <p>判断问题集中在哪类搜索意图。</p>
+                  </div>
+                </div>
+                <div id="keywordTypeList" class="keyword-type-list"></div>
+              </article>
+            </div>
+
+            <article class="keyword-card keyword-diff-card">
+              <div class="keyword-card-header">
+                <div>
+                  <h2>平台差异 TOP10 <span class="info-dot">i</span></h2>
+                  <p>单个词在不同平台的差异越大，越需要平台专项优化。</p>
+                </div>
+              </div>
+              <div class="keyword-table-wrap">
+                <table class="keyword-table">
+                  <thead id="keywordDiffHead"></thead>
+                  <tbody id="keywordDiffBody"></tbody>
+                </table>
+              </div>
+            </article>
+          </section>
+        </section>
+      </section>
+
+      <section id="contentSystem" class="system-screen hidden">
+        <header class="topbar">
+          <div class="selectors">
+            <select aria-label="当前项目">
+              <option>红星美羚羊奶粉内容优化项目</option>
+            </select>
+          </div>
+        </header>
+        <section class="stage">
+          <article class="empty-system">
+            <div class="section-title">CONTENT PRODUCTION</div>
+            <h1>内容生产系统</h1>
+            <p>本次 GitHub 发布仅整理需求挖掘系统，内容生产页面保留入口。</p>
           </article>
         </section>
       </section>

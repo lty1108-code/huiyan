@@ -28,9 +28,70 @@ const keywordRows = [
   { id: "kw_006", keyword: "宝宝羊奶粉怎么选", type: "industry", typeName: "行业词", platformName: "字节豆包", reached: true, rank: 4, sentiment: "positive" }
 ];
 
+const miningPhases = [
+  {
+    id: "industry",
+    name: "认知阶段",
+    typeName: "行业词",
+    icon: "verified",
+    desc: "用户正在了解品类、症状、场景与选型标准。",
+    goal: "沉淀品类教育与场景内容占位。",
+    saved: 50,
+    keywords: [
+      { id: "industry_1", text: "羊奶粉哪个牌子好吸收", heat: 96, intent: "选型", source: "搜索联想" },
+      { id: "industry_2", text: "宝宝喝羊奶粉容易上火吗", heat: 88, intent: "顾虑", source: "AI 推荐" },
+      { id: "industry_3", text: "羊奶粉和牛奶粉区别", heat: 82, intent: "科普", source: "搜索联想" },
+      { id: "industry_4", text: "中老年羊奶粉怎么选", heat: 73, intent: "场景", source: "AI 推荐" },
+      { id: "industry_5", text: "敏感体质适合羊奶粉吗", heat: 66, intent: "场景", source: "站内搜索" },
+      { id: "industry_6", text: "羊奶粉新国标怎么看", heat: 58, intent: "标准", source: "搜索联想" },
+      { id: "industry_7", text: "国产羊奶粉推荐", heat: 53, intent: "推荐", source: "AI 推荐" },
+      { id: "industry_8", text: "有机羊奶粉和普通羊奶粉区别", heat: 47, intent: "科普", source: "搜索联想" }
+    ]
+  },
+  {
+    id: "competitor",
+    name: "对比阶段",
+    typeName: "竞对词",
+    icon: "compare_arrows",
+    desc: "用户正在比较品牌、替代方案、口碑与价格。",
+    goal: "发现竞品拦截和对比内容缺口。",
+    saved: 36,
+    keywords: [
+      { id: "competitor_1", text: "红星美羚和佳贝艾特哪个好", heat: 94, intent: "品牌对比", source: "AI 推荐" },
+      { id: "competitor_2", text: "红星美羚和羊滋滋对比", heat: 86, intent: "品牌对比", source: "搜索联想" },
+      { id: "competitor_3", text: "国产羊奶粉十大品牌排行", heat: 79, intent: "榜单", source: "搜索联想" },
+      { id: "competitor_4", text: "佳贝艾特替代品牌", heat: 69, intent: "替代", source: "AI 推荐" },
+      { id: "competitor_5", text: "蓝河羊奶粉和红星美羚哪个好", heat: 61, intent: "品牌对比", source: "站内搜索" },
+      { id: "competitor_6", text: "羊奶粉品牌口碑对比", heat: 54, intent: "口碑", source: "搜索联想" }
+    ]
+  },
+  {
+    id: "product",
+    name: "决策解决",
+    typeName: "本品词",
+    icon: "shopping_cart_checkout",
+    desc: "用户已经关注本品，正在验证安全性、口碑与购买理由。",
+    goal: "补齐品牌防守、权威背书和转化内容。",
+    saved: 42,
+    keywords: [
+      { id: "product_1", text: "红星美羚羊奶粉怎么样", heat: 98, intent: "口碑", source: "搜索联想" },
+      { id: "product_2", text: "红星美羚羊奶粉配方优势", heat: 85, intent: "卖点", source: "AI 推荐" },
+      { id: "product_3", text: "红星美羚羊奶粉适合多大宝宝", heat: 74, intent: "适配", source: "站内搜索" },
+      { id: "product_4", text: "红星美羚羊奶粉官方旗舰店", heat: 68, intent: "购买", source: "搜索联想" },
+      { id: "product_5", text: "红星美羚羊奶粉负面评价", heat: 46, intent: "风险", source: "AI 推荐" },
+      { id: "product_6", text: "红星美羚羊奶粉奶源地", heat: 42, intent: "背书", source: "搜索联想" }
+    ]
+  }
+];
+
+let activeSystem = "mining";
 let activeTab = "overview";
 let selectedMetricKey = "reach";
 let selectedPlatform = allPlatform;
+let activeMiningPhase = "industry";
+let miningView = "bar";
+let miningSearchText = "";
+let selectedMiningIds = new Set();
 
 const iconUp = '<svg viewBox="0 0 28 18" aria-hidden="true"><polyline points="2,15 9,8 15,12 26,2" /></svg>';
 const iconDown = '<svg viewBox="0 0 28 18" aria-hidden="true"><polyline points="2,4 9,11 15,7 26,17" /></svg>';
@@ -38,6 +99,10 @@ const iconFlat = '<svg viewBox="0 0 28 18" aria-hidden="true"><polyline points="
 
 function metricByKey(key) {
   return metricOptions.find((metric) => metric.key === key) || metricOptions[0];
+}
+
+function miningPhaseById(id) {
+  return miningPhases.find((phase) => phase.id === id) || miningPhases[0];
 }
 
 function formatPercent(value) {
@@ -92,8 +157,34 @@ function keywordPlatformRate(row) {
   return (hits / platforms.length) * 100;
 }
 
+function renderSystemVisibility() {
+  document.querySelectorAll(".system-screen").forEach((screen) => {
+    const system = screen.id.replace("System", "");
+    screen.classList.toggle("hidden", system !== activeSystem);
+  });
+  document.querySelectorAll(".nav-item[data-system]").forEach((item) => {
+    item.classList.toggle("active", item.dataset.system === activeSystem);
+  });
+  const titles = {
+    mining: "野颂慧眼 - 需求挖掘系统",
+    analytics: "野颂慧眼 - 效果分析系统",
+    content: "野颂慧眼 - 内容生产系统"
+  };
+  document.title = titles[activeSystem] || titles.mining;
+}
+
+function bindSystemNav() {
+  document.querySelectorAll(".nav-item[data-system]").forEach((item) => {
+    item.addEventListener("click", () => {
+      activeSystem = item.dataset.system;
+      renderSystemVisibility();
+    });
+  });
+}
+
 function renderPlatformSelect() {
   const select = document.querySelector("#platformSelect");
+  if (!select) return;
   select.innerHTML = [allPlatform, ...platforms.map((item) => item.name)]
     .map((name) => `<option value="${name}">${name}</option>`)
     .join("");
@@ -110,7 +201,7 @@ function renderTabs() {
     tab.addEventListener("click", () => {
       activeTab = tab.dataset.tab;
       updateTabVisibility();
-      render();
+      renderAnalytics();
     });
   });
 }
@@ -125,6 +216,7 @@ function updateTabVisibility() {
 
 function renderMetricTabs(targetId) {
   const tabs = document.querySelector(targetId);
+  if (!tabs) return;
   tabs.innerHTML = metricOptions
     .map((metric) => `
       <button class="metric-chip${metric.key === selectedMetricKey ? " active" : ""}" data-key="${metric.key}" type="button">
@@ -135,7 +227,7 @@ function renderMetricTabs(targetId) {
   tabs.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => {
       selectedMetricKey = button.dataset.key;
-      render();
+      renderAnalytics();
     });
   });
 }
@@ -294,7 +386,7 @@ function bindKeywordModal() {
   });
 }
 
-function render() {
+function renderAnalytics() {
   renderMetricTabs("#metricTabs");
   renderFocusCard();
   renderBars();
@@ -302,8 +394,201 @@ function render() {
   renderKeywordPage();
 }
 
+function renderPhaseSelect() {
+  const select = document.querySelector("#phaseSelect");
+  select.innerHTML = miningPhases.map((phase) => `<option value="${phase.id}">${phase.name} / ${phase.typeName}</option>`).join("");
+  select.value = activeMiningPhase;
+  select.addEventListener("change", (event) => {
+    activeMiningPhase = event.target.value;
+    renderMining();
+  });
+}
+
+function renderPhaseCards() {
+  const container = document.querySelector("#phaseCards");
+  container.innerHTML = miningPhases
+    .map((phase, index) => `
+      <button class="phase-card${phase.id === activeMiningPhase ? " active" : ""}" data-phase="${phase.id}" type="button">
+        <span class="material-symbol">${phase.icon}</span>
+        <small>0${index + 1}</small>
+        <strong>${phase.name}</strong>
+        <em>${phase.typeName}</em>
+        <p>${phase.desc}</p>
+      </button>
+    `)
+    .join("");
+  container.querySelectorAll(".phase-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      activeMiningPhase = card.dataset.phase;
+      document.querySelector("#phaseSelect").value = activeMiningPhase;
+      renderMining();
+    });
+  });
+}
+
+function filteredMiningKeywords() {
+  const phase = miningPhaseById(activeMiningPhase);
+  const query = miningSearchText.trim().toLowerCase();
+  return phase.keywords.filter((item) => !query || item.text.toLowerCase().includes(query) || item.intent.toLowerCase().includes(query));
+}
+
+function renderMiningChart() {
+  const phase = miningPhaseById(activeMiningPhase);
+  const rows = phase.keywords.slice(0, 8);
+  document.querySelector("#miningChartDesc").textContent = `${phase.typeName}的高潜关键词热度分布。`;
+
+  if (miningView === "cloud") {
+    document.querySelector("#miningChart").className = "mining-chart word-cloud";
+    document.querySelector("#miningChart").innerHTML = rows
+      .map((item, index) => `
+        <button style="--size:${16 + item.heat / 8}px; --tone:${index % 3}" data-keyword="${item.id}" type="button">
+          ${item.text}
+        </button>
+      `)
+      .join("");
+    return;
+  }
+
+  document.querySelector("#miningChart").className = "mining-chart mining-bars";
+  document.querySelector("#miningChart").innerHTML = rows
+    .map((item) => `
+      <div class="mining-bar-row">
+        <span title="${item.text}">${item.text}</span>
+        <strong>${item.heat}</strong>
+        <i><b style="width:${item.heat}%"></b></i>
+      </div>
+    `)
+    .join("");
+}
+
+function renderMiningList() {
+  const rows = filteredMiningKeywords();
+  document.querySelector("#keywordList").innerHTML = `
+    <div class="mining-list-head">
+      <label><input id="selectAllMining" type="checkbox" ${rows.length && rows.every((row) => selectedMiningIds.has(row.id)) ? "checked" : ""} /> 关键词</label>
+      <span>意图</span>
+      <span>热度</span>
+      <span>来源</span>
+    </div>
+    ${rows.map((item) => `
+      <label class="mining-list-row">
+        <span><input type="checkbox" data-id="${item.id}" ${selectedMiningIds.has(item.id) ? "checked" : ""} /> ${item.text}</span>
+        <em>${item.intent}</em>
+        <strong>${item.heat}</strong>
+        <small>${item.source}</small>
+      </label>
+    `).join("")}
+  `;
+
+  document.querySelectorAll("#keywordList input[data-id]").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        selectedMiningIds.add(checkbox.dataset.id);
+      } else {
+        selectedMiningIds.delete(checkbox.dataset.id);
+      }
+      renderSelectedBar();
+      renderMiningList();
+    });
+  });
+
+  document.querySelector("#selectAllMining").addEventListener("change", (event) => {
+    rows.forEach((item) => {
+      if (event.target.checked) {
+        selectedMiningIds.add(item.id);
+      } else {
+        selectedMiningIds.delete(item.id);
+      }
+    });
+    renderSelectedBar();
+    renderMiningList();
+  });
+}
+
+function renderProgressCards() {
+  document.querySelector("#progressCards").innerHTML = miningPhases
+    .map((phase) => `
+      <div class="progress-card${phase.id === activeMiningPhase ? " active" : ""}">
+        <span>${phase.name}</span>
+        <strong>${phase.saved}</strong>
+        <em>${phase.typeName}</em>
+      </div>
+    `)
+    .join("");
+}
+
+function renderSelectedBar() {
+  document.querySelector("#selectedCount").textContent = selectedMiningIds.size;
+  document.querySelector("#selectedBar").classList.toggle("active", selectedMiningIds.size > 0);
+}
+
+function renderMining() {
+  const phase = miningPhaseById(activeMiningPhase);
+  document.querySelector("#phaseSelect").value = activeMiningPhase;
+  document.querySelector("#miningKeywordTotal").textContent = miningPhases.reduce((sum, item) => sum + item.saved, 0);
+  document.querySelector("#miningNewCount").textContent = phase.keywords.length;
+  renderPhaseCards();
+  renderMiningChart();
+  renderMiningList();
+  renderProgressCards();
+  renderSelectedBar();
+}
+
+function bindMiningControls() {
+  document.querySelectorAll(".view-switch button").forEach((button) => {
+    button.addEventListener("click", () => {
+      miningView = button.dataset.view;
+      document.querySelectorAll(".view-switch button").forEach((item) => item.classList.toggle("active", item.dataset.view === miningView));
+      renderMiningChart();
+    });
+  });
+
+  document.querySelector("#keywordSearch").addEventListener("input", (event) => {
+    miningSearchText = event.target.value;
+    renderMiningList();
+  });
+
+  document.querySelector("#clearSelected").addEventListener("click", () => {
+    selectedMiningIds.clear();
+    renderSelectedBar();
+    renderMiningList();
+  });
+
+  document.querySelector("#saveSelected").addEventListener("click", () => {
+    const button = document.querySelector("#saveSelected");
+    button.textContent = "已保存";
+    window.setTimeout(() => {
+      button.textContent = "保存到关键词组";
+    }, 900);
+  });
+
+  ["#runMining", "#startMiningInline"].forEach((selector) => {
+    document.querySelector(selector).addEventListener("click", () => {
+      const button = document.querySelector(selector);
+      const original = button.textContent;
+      button.textContent = "挖掘中...";
+      window.setTimeout(() => {
+        button.textContent = original;
+      }, 900);
+    });
+  });
+
+  document.querySelector("#savePhase").addEventListener("click", () => {
+    const button = document.querySelector("#savePhase");
+    button.textContent = "已保存当前阶段";
+    window.setTimeout(() => {
+      button.textContent = "保存当前阶段";
+    }, 900);
+  });
+}
+
+bindSystemNav();
+renderSystemVisibility();
 renderPlatformSelect();
 renderTabs();
 updateTabVisibility();
 bindKeywordModal();
-render();
+renderPhaseSelect();
+bindMiningControls();
+renderAnalytics();
+renderMining();
